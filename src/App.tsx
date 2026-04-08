@@ -18,15 +18,24 @@ import {
   BedDouble,
   ChevronLeft,
   ChevronRight,
+  ArrowLeft,
   Plus,
-  Minus
+  Minus,
+  X,
+  Instagram,
+  Facebook,
+  Twitter
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
 
+import { RoomPage } from './components/RoomPage';
+import { BookingModal } from './components/BookingModal';
+import { allRooms } from './data/rooms';
+
 // --- Components ---
 
-const Navbar = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) => (
+const Navbar = ({ setCurrentPage, onOpenBooking }: { setCurrentPage: (page: string) => void, onOpenBooking: () => void }) => (
   <header className="fixed top-0 w-full z-50 flex flex-col shadow-sm">
     {/* Top Contact Bar */}
     <div className="bg-indigo-primary text-linen-white/80 py-2 px-4 md:px-6 flex flex-col sm:flex-row justify-between items-center text-[10px] md:text-xs font-medium tracking-wide gap-2 sm:gap-0">
@@ -54,9 +63,8 @@ const Navbar = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) 
       </div>
       <div className="flex gap-4 md:gap-8 items-center">
         <button onClick={() => setCurrentPage('home')} className="text-xs md:text-sm font-bold text-indigo-primary hover:text-terracotta-accent transition-colors uppercase tracking-wide hidden sm:block">Home</button>
-        <button onClick={() => { setCurrentPage('home'); setTimeout(() => window.location.hash = '#rooms', 100); }} className="text-xs md:text-sm font-bold text-indigo-primary hover:text-terracotta-accent transition-colors uppercase tracking-wide hidden sm:block">Rooms</button>
         <button onClick={() => setCurrentPage('gallery')} className="text-xs md:text-sm font-bold text-indigo-primary hover:text-terracotta-accent transition-colors uppercase tracking-wide hidden sm:block">Gallery</button>
-        <button className="bg-terracotta-accent text-linen-white px-6 md:px-8 py-2.5 md:py-3 rounded-md text-xs md:text-sm font-bold tracking-wide uppercase hover:bg-indigo-primary transition-colors duration-300 shadow-md">
+        <button onClick={onOpenBooking} className="bg-terracotta-accent text-linen-white px-6 md:px-8 py-2.5 md:py-3 rounded-md text-xs md:text-sm font-bold tracking-wide uppercase hover:bg-indigo-primary hover:scale-105 active:scale-95 transition-all duration-300 shadow-md">
           Book Now
         </button>
       </div>
@@ -64,7 +72,7 @@ const Navbar = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) 
   </header>
 );
 
-const Hero = () => (
+const Hero = ({ onOpenBooking }: { onOpenBooking: () => void }) => (
   <section className="relative pt-40 pb-16 md:pt-48 md:pb-24 px-6 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
     {/* Left Column: Content & Social Proof */}
     <div className="flex-1 text-center lg:text-left z-10">
@@ -100,7 +108,7 @@ const Hero = () => (
         transition={{ delay: 0.3 }}
         className="flex flex-col sm:flex-row items-center gap-6 justify-center lg:justify-start mb-12"
       >
-        <button className="bg-terracotta-accent text-linen-white px-10 py-4 rounded-md text-lg font-bold tracking-wide uppercase hover:bg-indigo-primary transition-colors duration-300 shadow-xl w-full sm:w-auto">
+        <button onClick={onOpenBooking} className="bg-terracotta-accent text-linen-white px-10 py-4 rounded-md text-lg font-bold tracking-wide uppercase hover:bg-indigo-primary hover:scale-105 active:scale-95 transition-all duration-300 shadow-xl w-full sm:w-auto">
           Check Availability
         </button>
       </motion.div>
@@ -248,19 +256,10 @@ const MeetTheHosts = () => (
   </section>
 );
 
-const RoomGallery = () => {
+const RoomGallery = ({ onOpenBooking, setCurrentPage }: { onOpenBooking: (roomId: number) => void, setCurrentPage: (page: string) => void }) => {
   const [filter, setFilter] = useState('All');
   const [page, setPage] = useState(1);
   const itemsPerPage = 3;
-
-  const allRooms = [
-    { id: 1, title: "Garden Suite", category: "Suite", img: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&q=80&w=800", price: "R 1,200", guests: 2, size: "45m²", bed: "King Bed", amenities: ["Kitchenette", "Air Conditioning", "Smart TV", "Private Patio"] },
-    { id: 2, title: "Quiet Retreat Room", category: "Standard", img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=800", price: "R 850", guests: 2, size: "30m²", bed: "Queen Bed", amenities: ["Coffee Station", "Smart TV", "Work Desk", "En-suite"] },
-    { id: 3, title: "Comfort Studio", category: "Studio", img: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&q=80&w=800", price: "R 950", guests: 2, size: "35m²", bed: "Queen Bed", amenities: ["Kitchenette", "Smart TV", "Lounge Area", "Garden View"] },
-    { id: 4, title: "Family Garden Villa", category: "Suite", img: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=800", price: "R 1,800", guests: 4, size: "65m²", bed: "2x Queen Beds", amenities: ["Full Kitchen", "Air Conditioning", "Smart TV", "Private Garden"] },
-    { id: 5, title: "Business Standard", category: "Standard", img: "https://images.unsplash.com/photo-1522771731470-53ff8e3ee0e5?auto=format&fit=crop&q=80&w=800", price: "R 800", guests: 1, size: "25m²", bed: "Double Bed", amenities: ["Fast Fibre WiFi", "Work Desk", "Smart TV", "Coffee Station"] },
-    { id: 6, title: "Honeymoon Suite", category: "Suite", img: "https://images.unsplash.com/photo-1502672260266-1c1e52408437?auto=format&fit=crop&q=80&w=800", price: "R 1,500", guests: 2, size: "50m²", bed: "King Bed", amenities: ["Luxury Bath", "Air Conditioning", "Room Service", "Balcony"] },
-  ];
 
   const categories = ['All', 'Standard', 'Studio', 'Suite'];
 
@@ -344,9 +343,14 @@ const RoomGallery = () => {
                     ))}
                   </ul>
                   
-                  <button className="w-full mt-auto py-3 border-2 border-indigo-primary text-indigo-primary font-bold tracking-wide uppercase rounded-md hover:bg-indigo-primary hover:text-linen-white transition-colors duration-300">
-                    View Details
-                  </button>
+                  <div className="mt-auto flex flex-col gap-2">
+                    <button onClick={() => setCurrentPage(`room_${room.id}`)} className="w-full py-3 bg-indigo-primary text-linen-white font-bold tracking-wide uppercase rounded-md hover:bg-indigo-light hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-sm">
+                      View Details
+                    </button>
+                    <button onClick={() => onOpenBooking(room.id)} className="w-full py-3 border-2 border-indigo-primary text-indigo-primary font-bold tracking-wide uppercase rounded-md hover:bg-indigo-primary hover:text-linen-white hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                      Book This Room
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -415,7 +419,7 @@ const Amenities = () => {
         </div>
         <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
           {items.map((item, idx) => (
-            <div key={idx} className="flex gap-6 p-6 rounded-2xl border border-stone-neutral hover:border-sage-secondary transition-colors group">
+            <div key={idx} className="flex gap-6 p-6 rounded-2xl border border-stone-neutral hover:border-sage-secondary hover:shadow-md hover:-translate-y-1 transition-all duration-300 group bg-white">
               <div className="text-sage-secondary group-hover:scale-110 transition-transform">
                 {item.icon}
               </div>
@@ -449,7 +453,7 @@ const HomeGallery = ({ setCurrentPage }: { setCurrentPage: (page: string) => voi
         </div>
         <button 
           onClick={() => setCurrentPage('gallery')}
-          className="shrink-0 border-2 border-indigo-primary text-indigo-primary px-6 py-3 rounded-md font-bold tracking-wide uppercase hover:bg-indigo-primary hover:text-linen-white transition-colors duration-300"
+          className="shrink-0 border-2 border-indigo-primary text-indigo-primary px-6 py-3 rounded-md font-bold tracking-wide uppercase hover:bg-indigo-primary hover:text-linen-white hover:scale-105 active:scale-95 transition-all duration-300"
         >
           View All Pictures
         </button>
@@ -473,7 +477,7 @@ const HomeGallery = ({ setCurrentPage }: { setCurrentPage: (page: string) => voi
   );
 };
 
-const FullGallery = () => {
+const FullGallery = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) => {
   const allImages = [
     "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=800",
     "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&q=80&w=800",
@@ -488,7 +492,13 @@ const FullGallery = () => {
   ];
 
   return (
-    <div className="pt-40 pb-24 px-6 max-w-7xl mx-auto min-h-screen">
+    <div className="pt-32 pb-24 px-6 max-w-7xl mx-auto min-h-screen">
+      <button 
+        onClick={() => setCurrentPage('home')}
+        className="flex items-center gap-2 text-indigo-primary hover:text-terracotta-accent transition-colors font-bold uppercase tracking-wide text-sm mb-8"
+      >
+        <ArrowLeft className="w-4 h-4" /> Back to Home
+      </button>
       <div className="text-center mb-16">
         <h1 className="text-5xl md:text-6xl text-indigo-primary mb-6">Our Gallery</h1>
         <p className="text-xl text-text-body/80 max-w-2xl mx-auto">Immerse yourself in the beauty of Garden Corner Guest House.</p>
@@ -531,7 +541,7 @@ const FAQ = () => {
           
           <div className="space-y-4">
             {faqs.map((faq, idx) => (
-              <div key={idx} className="bg-linen-white rounded-xl shadow-sm overflow-hidden border border-stone-neutral/50">
+              <div key={idx} className={`bg-linen-white rounded-xl shadow-sm overflow-hidden border transition-colors duration-300 ${openIndex === idx ? 'border-indigo-primary' : 'border-stone-neutral/50 hover:border-indigo-primary/50'}`}>
                 <button 
                   onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
                   className="w-full px-6 py-5 flex justify-between items-center text-left focus:outline-none hover:bg-stone-neutral/30 transition-colors"
@@ -588,18 +598,160 @@ const FAQ = () => {
   );
 };
 
+const ContactSection = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  return (
+    <section className="py-24 px-6 bg-linen-white">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        {/* Left Column - Text & Buttons */}
+        <div>
+          <p className="text-sage-secondary font-bold uppercase tracking-widest text-sm mb-4">Get in Touch</p>
+          <h2 className="text-4xl md:text-5xl font-serif text-indigo-primary mb-6 leading-tight">We're Here to Help</h2>
+          <p className="text-lg text-text-body/80 mb-10">
+            Have questions about your stay or need assistance with a booking? Reach out to us directly or drop us a message.
+          </p>
+          
+          <div className="space-y-6 mb-10">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-stone-neutral rounded-full text-indigo-primary"><MapPin className="w-6 h-6" /></div>
+              <div>
+                <p className="font-bold text-indigo-primary">Address</p>
+                <p className="text-text-body/80">13 Ivy Avenue, Arcon Park, Vereeniging, 1937</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-stone-neutral rounded-full text-indigo-primary"><Phone className="w-6 h-6" /></div>
+              <div>
+                <p className="font-bold text-indigo-primary">Phone</p>
+                <p className="text-text-body/80">+27 (0) 12 345 6789</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-stone-neutral rounded-full text-indigo-primary"><Mail className="w-6 h-6" /></div>
+              <div>
+                <p className="font-bold text-indigo-primary">Email</p>
+                <p className="text-text-body/80">info@gardencorner.co.za</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button onClick={() => setIsModalOpen(true)} className="bg-indigo-primary text-linen-white px-8 py-3 rounded-md font-bold uppercase tracking-wide hover:bg-indigo-light hover:scale-105 active:scale-95 transition-all duration-300 shadow-md text-sm text-center">
+              Leave us a message
+            </button>
+            <a href="https://wa.me/27786895713" target="_blank" rel="noreferrer" className="bg-[#25D366] text-white px-8 py-3 rounded-md font-bold uppercase tracking-wide hover:brightness-110 hover:scale-105 active:scale-95 transition-all duration-300 shadow-md flex items-center justify-center gap-2 text-sm">
+              <MessageCircle className="w-4 h-4" /> Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+
+        {/* Right Column - Map */}
+        <div className="relative h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-elevation border-4 border-white">
+          <iframe 
+            width="100%" 
+            height="100%" 
+            style={{border:0}} 
+            loading="lazy" 
+            allowFullScreen 
+            referrerPolicy="no-referrer-when-downgrade" 
+            src="https://maps.google.com/maps?q=13+Ivy+Avenue,+Arcon+Park,+Vereeniging&t=&z=15&ie=UTF8&iwloc=&output=embed"
+          ></iframe>
+          {/* Google Maps Logo Overlay */}
+          <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-md flex items-center gap-2 pointer-events-none">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Google_Maps_icon_%282020%29.svg/512px-Google_Maps_icon_%282020%29.svg.png" alt="Google Maps" className="w-6 h-6" />
+            <span className="font-bold text-indigo-primary text-sm tracking-tight">Google Maps</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="absolute inset-0 bg-indigo-primary/40 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-linen-white w-full max-w-lg rounded-2xl shadow-2xl relative z-10 overflow-hidden"
+            >
+              <div className="p-6 border-b border-stone-neutral flex justify-between items-center bg-stone-neutral/30">
+                <h3 className="text-2xl font-serif text-indigo-primary">Send a Message</h3>
+                <button onClick={() => setIsModalOpen(false)} className="text-text-body/50 hover:text-indigo-primary transition-colors">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="p-6 md:p-8">
+                {!submitted ? (
+                  <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold text-indigo-primary mb-1">Name</label>
+                      <input type="text" required className="w-full p-3 border border-stone-neutral rounded-lg focus:ring-2 focus:ring-sage-secondary outline-none" placeholder="Your name" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-indigo-primary mb-1">Email</label>
+                      <input type="email" required className="w-full p-3 border border-stone-neutral rounded-lg focus:ring-2 focus:ring-sage-secondary outline-none" placeholder="your@email.com" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-indigo-primary mb-1">Message</label>
+                      <textarea required rows={4} className="w-full p-3 border border-stone-neutral rounded-lg focus:ring-2 focus:ring-sage-secondary outline-none resize-none" placeholder="How can we help you?"></textarea>
+                    </div>
+                    <button type="submit" className="w-full py-3 bg-terracotta-accent text-linen-white font-bold tracking-wide uppercase rounded-md hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-md mt-4">
+                      Send Message
+                    </button>
+                  </form>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-sage-mint rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle2 className="w-8 h-8 text-sage-secondary" />
+                    </div>
+                    <h4 className="text-xl font-bold text-indigo-primary mb-2">Message Sent!</h4>
+                    <p className="text-text-body/80 mb-6">Thank you for reaching out. We will get back to you shortly.</p>
+                    <button onClick={() => { setSubmitted(false); setIsModalOpen(false); }} className="px-6 py-2 border-2 border-indigo-primary text-indigo-primary font-bold rounded-md hover:bg-indigo-primary hover:text-linen-white transition-colors">
+                      Close
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </section>
+  );
+};
+
 const Footer = () => (
   <footer className="bg-linen-white pt-24 pb-12 px-6 border-t border-stone-neutral">
-    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
       <div className="md:col-span-2">
         <div className="flex items-center gap-2 mb-6">
           <div className="w-10 h-10 bg-indigo-primary flex items-center justify-center rounded-lg text-linen-white font-serif text-xl">G</div>
           <span className="font-serif text-2xl text-indigo-primary">Garden Corner</span>
         </div>
-        <p className="text-lg text-text-body/70 max-w-md leading-relaxed">
+        <p className="text-lg text-text-body/70 max-w-md leading-relaxed mb-8">
           13 Ivy Avenue, Arcon Park, Vereeniging, 1937, South Africa. <br />
           A dedicated team committed to your quiet rest.
         </p>
+        <div className="flex items-center gap-4">
+          <a href="#" className="w-10 h-10 rounded-full border border-stone-neutral flex items-center justify-center text-indigo-primary hover:bg-indigo-primary hover:text-linen-white hover:border-indigo-primary transition-all duration-300">
+            <Instagram className="w-4 h-4" />
+          </a>
+          <a href="#" className="w-10 h-10 rounded-full border border-stone-neutral flex items-center justify-center text-indigo-primary hover:bg-indigo-primary hover:text-linen-white hover:border-indigo-primary transition-all duration-300">
+            <Facebook className="w-4 h-4" />
+          </a>
+          <a href="#" className="w-10 h-10 rounded-full border border-stone-neutral flex items-center justify-center text-indigo-primary hover:bg-indigo-primary hover:text-linen-white hover:border-indigo-primary transition-all duration-300">
+            <Twitter className="w-4 h-4" />
+          </a>
+        </div>
       </div>
       <div>
         <h4 className="font-bold text-indigo-primary mb-6 uppercase tracking-widest text-xs">Contact</h4>
@@ -624,10 +776,10 @@ const Footer = () => (
     
     {/* WhatsApp FAB */}
     <a 
-      href="https://wa.me/yournumber" 
+      href="https://wa.me/27786895713" 
       target="_blank" 
       rel="noreferrer"
-      className="fixed bottom-8 right-8 bg-[#25D366] text-linen-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform z-50 flex items-center gap-2"
+      className="fixed bottom-8 right-8 bg-[#25D366] text-linen-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-transform z-50 flex items-center gap-2"
     >
       <MessageCircle className="w-6 h-6" />
       <span className="hidden md:inline font-bold">Need help? Message us</span>
@@ -639,24 +791,46 @@ const Footer = () => (
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [bookingContext, setBookingContext] = useState<{
+    isOpen: boolean;
+    intent: 'check_availability' | 'book_general' | 'book_specific';
+    roomId?: number;
+  }>({ isOpen: false, intent: 'book_general' });
+
+  const openBooking = (intent: 'check_availability' | 'book_general' | 'book_specific', roomId?: number) => {
+    setBookingContext({ isOpen: true, intent, roomId });
+  };
 
   return (
     <div className="min-h-screen selection:bg-sage-mint selection:text-sage-secondary">
-      <Navbar setCurrentPage={setCurrentPage} />
+      <Navbar setCurrentPage={setCurrentPage} onOpenBooking={() => openBooking('book_general')} />
       {currentPage === 'home' ? (
         <>
-          <Hero />
+          <Hero onOpenBooking={() => openBooking('check_availability')} />
           <TrustBar />
           <MeetTheHosts />
-          <RoomGallery />
+          <RoomGallery onOpenBooking={(roomId) => openBooking('book_specific', roomId)} setCurrentPage={setCurrentPage} />
           <Amenities />
           <HomeGallery setCurrentPage={setCurrentPage} />
           <FAQ />
+          <ContactSection />
         </>
-      ) : (
-        <FullGallery />
-      )}
+      ) : currentPage === 'gallery' ? (
+        <FullGallery setCurrentPage={setCurrentPage} />
+      ) : currentPage.startsWith('room_') ? (
+        <RoomPage 
+          roomId={parseInt(currentPage.split('_')[1])} 
+          setCurrentPage={setCurrentPage} 
+          onOpenBooking={(roomId) => openBooking('book_specific', roomId)} 
+        />
+      ) : null}
       <Footer />
+      <BookingModal 
+        isOpen={bookingContext.isOpen} 
+        intent={bookingContext.intent}
+        preselectedRoomId={bookingContext.roomId}
+        onClose={() => setBookingContext(prev => ({ ...prev, isOpen: false }))} 
+      />
     </div>
   );
 }
