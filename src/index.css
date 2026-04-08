@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Lato", sans-serif;
+
+  --color-indigo-primary: #1A2A3A;
+  --color-indigo-light: #2C4259;
+  --color-sage-secondary: #7B9071;
+  --color-sage-mint: #E8EFE5;
+  --color-linen-white: #FFFFFF;
+  --color-stone-neutral: #F5F5F5;
+  --color-terracotta-accent: #D36B46;
+  --color-gold-accent: #E2A646;
+  --color-text-body: #4A4A4A;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@700&display=swap');
+
+@layer base {
+  body {
+    @apply font-sans text-text-body bg-linen-white;
+  }
+  h1, h2, h3, h4 {
+    @apply font-serif text-indigo-primary;
+  }
+}
